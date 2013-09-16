@@ -28,10 +28,11 @@
 
 struct packet
 {
-    uint16_t type;          //数据包的类型
-    uint8_t id:7;       //表示包的id
-    uint8_t feedback:1; //是否需要回包
-    uint16_t object_id;            //操作的id
+    uint16_t type;                  //数据包的类型
+    uint8_t id:7;                   //表示包的id
+    uint8_t feedback:1;             //是否需要回包
+    uint16_t object_id;             //操作的id
+    uint16_t length;
     uint32_t param;
     char data[0];
 };

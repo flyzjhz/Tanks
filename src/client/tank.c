@@ -34,17 +34,37 @@ int init_socket(char *,uint16_t);
 void quit(int);
 void send_command(uint16_t type,uint32_t param);
 
+void request_all_object(){
+    send_command(PACKET_ALL_OBJECT_REQUEST, 0);
+}
+
 int main(int argc, char *argv[])
 {
-    init_socket(argv[1],atoi(argv[2]));
+    char *ip, *port;
+    if(argc < 3){
+        port = "8887";
+    }else{
+        port = argv[2];
+    }
+    if(argc < 2){
+        ip = "127.0.0.1";
+    }else{
+        ip = argv[1];
+    }
+    init_socket(ip,atoi(port));
     memset(&scene, 0, sizeof(scene));
     init_objects();
     join_game();
-    recv_packet();
+    if(fork() != 0){
+        /*main process*/
+        recv_packet();
+    }
+    request_all_object();
 }
 
 int join_game()
 {
+    printf("join_gaming...\n");
     send_command(PACKET_JOIN_GAME, 0);
     socklen_t len = sizeof(srv);
     struct packet *recv_packet = malloc(PACKET_MAX_SIZE);
@@ -93,6 +113,7 @@ int refresh()
 int sock_handler(struct packet *recv_packet,int length)
 {
     int is_draw = 0;
+    printf("recv_packet->type = %d\n", recv_packet->type);
     switch(recv_packet->type)
     {
         case PACKET_OBJECT_MOVE:
@@ -211,15 +232,16 @@ int recv_packet()
     int ret;
     char *buf = malloc(PACKET_MAX_SIZE);
     ERRP(NULL == buf, goto ERR0, 2, "recv_packet,malloc");
-    char *old_buf;
     while(1)
     {
-        while((ret = recvfrom(socket_id, buf, PACKET_MAX_SIZE,0, (struct sockaddr *)&srv, &len)) > 0)
+        /*while((ret = recvfrom(socket_id, buf, PACKET_MAX_SIZE,0, (struct sockaddr *)&srv, &len)) > 0)
         {
+            printf("%d------------\n", ret);
             buf += ret;
-        }
+        }*/
+        ret = recvfrom(socket_id, buf, PACKET_MAX_SIZE,0, (struct sockaddr *)&srv, &len);
         ERRP(-1 == ret, goto ERR1, 2, "connect,recvfrom");
-        sock_handler((struct packet *)old_buf,buf - old_buf);
+        sock_handler((struct packet *)buf, ret);
     }
     return 0;
 ERR1:

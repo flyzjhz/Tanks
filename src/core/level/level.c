@@ -82,7 +82,7 @@ int get_level_index_of_file(int f_id,int index)
     int ret;
     /*由于需要读取struct level_objects,需要多分配一些内存空间*/
     struct level *level = (struct level *)malloc(20 * sizeof(struct level));
-    ERRP(!level, goto ERR0, 1, "get_level_index_of_file,malloc");
+    ERRP(!level, goto ERR0, 1, "get_level_index_of_file,malloc\n");
     int offset = 0,i=0,count,length;
     while(1)
     {

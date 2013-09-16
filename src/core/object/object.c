@@ -24,13 +24,13 @@ int add_one_object(scene_t *scene,uint16_t team,uint16_t friends, uint16_t objec
 {
     int index = find_object_id(scene, object_id);
     ERRP(-1 == index, return -1, 1,"add_one_object:cannot find object_id[%d]\n",object_id);
-    ERRP(point.x + scene->cur_scene.p_level->dd * scene->objects[index].width > scene->cur_scene.p_level->size.width || point.y + scene->cur_scene.p_level->dd * scene->objects[index].height > scene->cur_scene.p_level->size.height, return -1, 1, "add_one_object:point above max_size");
+    ERRP(point.x + scene->cur_scene.p_level->dd * scene->objects[index].width > scene->cur_scene.p_level->size.width || point.y + scene->cur_scene.p_level->dd * scene->objects[index].height > scene->cur_scene.p_level->size.height, return -1, 1, "add_one_object:point above max_size\n");
 
     /*增加存放所有物体的连表 tk_object_t,并设置其属性*/
     if(scene->cur_scene.object_item->size++ == scene->cur_scene.object_item->max_size)
     {
         tk_object_t *list = malloc(scene->cur_scene.object_item->inc * sizeof(tk_object_t));
-        ERRP(NULL == list, return -1, 2, "add_one_object:malloc");
+        ERRP(NULL == list, return -1, 2, "add_one_object:malloc\n");
         scene->cur_scene.next_object = list;
         int i;
         for(i = 0; i < scene->cur_scene.object_item->inc - 1; ++i)
@@ -71,9 +71,9 @@ int add_one_object(scene_t *scene,uint16_t team,uint16_t friends, uint16_t objec
 int init_cur_scene( cur_scene_t * cur_scene, uint8_t inc)
 {
     cur_scene->object_item = (struct object_item *)malloc(sizeof(struct object_item));
-    ERRP(!cur_scene->object_item, goto ERR0, 2,"malloc init_scene->object_item");
+    ERRP(!cur_scene->object_item, goto ERR0, 2,"malloc init_scene->object_item\n");
     cur_scene->hash_team = (struct hash_team *)malloc(MAX_TEAM * sizeof(struct hash_team));
-    ERRP(!cur_scene->hash_team, goto ERR1, 2,"malloc init_scene->hash_team");
+    ERRP(!cur_scene->hash_team, goto ERR1, 2,"malloc init_scene->hash_team\n");
     cur_scene->hash_friends = (struct hash_friends *)malloc(MAX_TEAM * sizeof(struct hash_friends));
     ERRP(!cur_scene->hash_friends, goto ERR2, 2,"malloc init_scene->hash_frineds");
 
@@ -122,7 +122,7 @@ int load_all_object(const char *filepath,struct tk_object_table **object)
     struct stat stat;
     fstat(f_id, &stat);
 
-    ERRP(!stat.st_size%sizeof(struct tk_object_table), goto ERR1, 1, "load_all_ai:the %s file format error",filepath);
+    ERRP(!stat.st_size%sizeof(struct tk_object_table), goto ERR1, 1, "load_all_ai:the %s file format error\n",filepath);
     (*object) = malloc(stat.st_size);
     char *buf = (char *)(*object);
     int ret;
@@ -266,7 +266,7 @@ int write_object(const int f_id,const int index,const struct tk_object_table obj
     struct stat stat;
     fstat(f_id, &stat);
     /*printf("stat.st_size=%d,sizeof = %d\n",stat.st_size,sizeof(struct tk_object_table));*/
-    ERRP(stat.st_size%sizeof(struct tk_object_table), goto ERR0, 1, "load_all_object:file format error");
+    ERRP(stat.st_size%sizeof(struct tk_object_table), goto ERR0, 1, "load_all_object:file format error\n");
     int size = stat.st_size - index * sizeof(struct tk_object_table);
     char *buf = NULL;
     if(size > 0)
